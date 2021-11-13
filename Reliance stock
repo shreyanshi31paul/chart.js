@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Reliance Stock Tracker</title>
+  </head>
+  <body>
+    <br>
+    <center><h1 style="color:rgb(59,124,124);">Rising Reliance Stock data using chart-js</h1></center>
+    <br>
+    <br>
+    <div>
+      <canvas id="myChart"></canvas>
+    </div>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js@3.3.2"></script>
+      <script src="https://cdn.jsdelivr.net/npm/luxon@1.27.0"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.0.0"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-streaming@2.0.0"></script>
+      <script> 
+        const config = { type: 'line',
+                                data: {
+                                        datasets: [{label: 'Reliance price',
+                                                    backgroundColor: 'rgba(212,230,244,0.94)',
+                                                    borderColor: 'rgba(59,124,124,0.91)',
+                                                    borderDash: [8, 4],
+                                                    fill: true,
+                                                    data: []},
+                                                  ]
+                                      },
+                                 options: { scales: { x: { type: 'realtime', 
+                                                           realtime: { delay: 10000,
+                                                                       refresh: 10000,
+                                                                       duration: 20000,
+                                                                       onRefresh: async chart => { const res = await fetch("https://api.coindesk.com/v1/bpi/currentprice.json");
+                                                                                                   const data = await res.json();
+                                                                                                   console.log(data);
+                                                                                                   chart.data.datasets.forEach(dataset => {
+                                                                                                                    dataset.data.push({
+                                                                                                                                x: Date.now(),
+                                                                                                                                y: data.bpi['USD'].rate_float
+                                                                                                                    });
+                                                                                                   });
+                                                                                                 }
+                                                                     }
+                                                         }
+                                                    }
+                                          }
+                              };
+
+        const myChart = new Chart( document.getElementById('myChart'), config );
+      </script>
+  </body>
+</html>
